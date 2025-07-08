@@ -2,24 +2,21 @@ import { Schema, model } from "mongoose";
 
 const clientsSchema = new Schema(
   {
-    name: {
+    clientId: {
+      type: Schema.Types.ObjectId,
+      ref: "clients",
+      required: true,
+    },
+    vehicle: { 
       type: String,
       required: true,  
     },
-    email: { 
+    service: {
       type: String,
       required: true,  
     },
-    password: {
+    status: {
       type: String,
-      required: true,  
-    },
-    phone: {
-      type: String,
-      required: true,  
-    },
-    age: {
-      type: Number,
       required: true,  
     },
   },

@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const clientsSchema = new Schema(
+const reservationsSchema = new Schema(
   {
     name: {
       type: String,
@@ -29,4 +29,4 @@ const clientsSchema = new Schema(
   }
 );
 
-export default model("clients", clientsSchema);
+export default model("reservations", reservationsSchema);
