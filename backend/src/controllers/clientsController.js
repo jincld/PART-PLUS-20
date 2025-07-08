@@ -1,6 +1,7 @@
 const clientsController = {};
 import clientsModel from "../models/clients.js";
 import bcryptjs from "bcryptjs";
+import mongoose from "mongoose";
 
 // Función para validar el formato del email
 const validateEmail = (email) => {
@@ -8,7 +9,30 @@ const validateEmail = (email) => {
   return regex.test(email);
 };
 
-// GET - Obtener clientes
+// Obtener un cliente por su ID
+clientsController.getClientID = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+
+    const client = await clientsModel.findById(id);
+
+    if (!client) {
+      return res.status(404).json({ message: "Cliente no encontrado" });
+    }
+
+    return res.status(200).json(client);
+  } catch (error) {
+    console.error("Error al obtener el cliente:", error);
+    return res.status(500).json({ message: "Error al obtener el cliente" });
+  }
+};
+
+
+// GET - Obtener todos los clientes
 clientsController.getClients = async (req, res) => {
   try {
     const clients = await clientsModel.find();
@@ -104,7 +128,7 @@ clientsController.updateClients = async (req, res) => {
     // Si se proporciona una nueva contraseña, encriptarla
     let hashedPassword = password;
     if (password) {
-      hashedPassword = await bcrypt.hash(password, 10);  // Se cifra la contraseña con 10 rondas
+      hashedPassword = await bcryptjs.hash(password, 10);  // Se cifra la contraseña con 10 rondas
     }
 
     const updatedClient = await clientsModel.findByIdAndUpdate(
@@ -112,7 +136,7 @@ clientsController.updateClients = async (req, res) => {
       {
         name,
         email,
-        password:hashedPassword,
+        password: hashedPassword,
         age,
         phone,
       },

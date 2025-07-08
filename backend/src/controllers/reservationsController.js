@@ -5,19 +5,41 @@ import mongoose from "mongoose";
 // Validar ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-// GET - Obtener todas las reservas
-reservationsController.getClients = async (req, res) => {
+// Obtener una reservación por su ID
+reservationsController.getReservationID = async (req, res) => {
   try {
-    const reservations = await reservationsModel.find().populate("clientId");
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+
+    const client = await reservationsModel.findById(id);
+
+    if (!client) {
+      return res.status(404).json({ message: "Reservación no encontrada" });
+    }
+
+    return res.status(200).json(client);
+  } catch (error) {
+    console.error("Error al obtener la reservación:", error);
+    return res.status(500).json({ message: "Error al obtener la reservación" });
+  }
+};
+
+// GET - Obtener todas las reservas
+reservationsController.getReservations = async (req, res) => {
+  try {
+    const reservations = await reservationsModel.find();
     res.status(200).json(reservations);
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ message: "No se encontraron reservas." });
+    console.log("Error" + error);
+    res.status(500).json({ message: "No se encontraron reservaciones." });
   }
 };
 
 // POST - Registrar nueva reserva
-reservationsController.registerClients = async (req, res) => {
+reservationsController.registerReservations = async (req, res) => {
   const { clientId, vehicle, service, status } = req.body;
 
   try {
@@ -46,7 +68,7 @@ reservationsController.registerClients = async (req, res) => {
 };
 
 // DELETE - Eliminar reserva por ID
-reservationsController.deleteClients = async (req, res) => {
+reservationsController.deleteReservations = async (req, res) => {
   try {
     const deleted = await reservationsModel.findByIdAndDelete(req.params.id);
     if (!deleted) {
@@ -60,7 +82,7 @@ reservationsController.deleteClients = async (req, res) => {
 };
 
 // PUT - Actualizar reserva por ID
-reservationsController.updateClients = async (req, res) => {
+reservationsController.updateReservations = async (req, res) => {
   try {
     const { clientId, vehicle, service, status } = req.body;
 
